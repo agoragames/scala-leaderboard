@@ -24,20 +24,28 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
 	def disconnect: Boolean = {
 	    redisClient.disconnect
     }
-    
+        
+    def totalMembers: Option[Int] = {
+        this.totalMembersIn(this.leaderboardName)
+    }
+        
     def totalMembersIn(leaderboardName: String): Option[Int] = {
         redisClient.zcard(leaderboardName)
     }
-    
-    def totalMembers: Option[Int] = {
-        this.totalMembersIn(this.leaderboardName)
+
+    def addMember(memberName:String, score: Double): Boolean = {
+        this.addMemberTo(this.leaderboardName, memberName, score)
     }
     
     def addMemberTo(leaderboardName:String, memberName: String, score: Double): Boolean = {
         redisClient.zadd(leaderboardName, score, memberName)
     }
     
-    def addMember(memberName:String, score: Double): Boolean = {
-        this.addMemberTo(this.leaderboardName, memberName, score)
+    def totalPages(leaderboardName:String): Int = {
+        this.totalPagesIn(this.leaderboardName, this.pageSize)
+    }
+    
+    def totalPagesIn(leaderboardName:String, pageSize: Int): Int = {
+		scala.math.ceil(this.totalMembersIn(leaderboardName).get.asInstanceOf[Float] / pageSize.asInstanceOf[Float]).asInstanceOf[Int]
     }
 }

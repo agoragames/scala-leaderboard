@@ -16,82 +16,62 @@ class LeaderboardSpec extends Spec
                         with BeforeAndAfterAll {
 
 	val redisClient = new RedisClient("localhost", 6379)
+    var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
 
 	override def beforeEach = {
+		redisClient.flushdb
 	}
 
 	override def afterEach = {
-		redisClient.flushdb
 	}
 
 	override def afterAll = {
 		redisClient.disconnect
+		leaderboard.disconnect
+	}
+	
+	private def addMembersToLeaderboard(totalMembers: Int) = {
+		for (i <- 1 to totalMembers) {
+			leaderboard.addMember("member_" + i, i)
+		}
 	}
 	
     describe("version") {
       it("should be the correct version") {
-          var leaderboard = new Leaderboard("leaderboard", "localhost", 6379, 25)
           
           leaderboard.version should equal("1.0.0")
-          leaderboard.disconnect
       }
     }
     
     describe("constructor") {
         it("should have the correct parameters") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
             leaderboard.leaderboardName should equal("leaderboard_name")
             leaderboard.pageSize should equal(25)
-            
-            leaderboard.disconnect
         }
     }
-    
-    describe("disconnect") {
-        it("should be able to disconnect from Redis") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
-            leaderboard.disconnect should equal(true)
-        }
-    }
-    
+        
     describe("totalMembers and totalMembersIn") {
         it("should return the correct number of members for totalMembers") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
             leaderboard.totalMembers should equal(Some(0))
             leaderboard.totalMembers.get should equal(0)
-            
-            leaderboard.disconnect
         }
         
         it("should return the correct number of members for totalMembersIn") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
             leaderboard.totalMembersIn("leaderboard_name") should equal(Some(0))
             leaderboard.totalMembersIn("leaderboard_name").get should equal(0)
-            
-            leaderboard.disconnect
         }
     }
     
     describe("addMember and addMemberTo") {
-        it("should be able to add a member to the leaderboard using addMember") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
+        it("should be able to add a member to the leaderboard using addMember") {        
             leaderboard.addMember("member", 1337) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
 
             leaderboard.addMember("member", 1338) should equal(false)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
-                        
-            leaderboard.disconnect
         }
 
         it("should be able to add a member to the leaderboard using addMemberTo") {
-            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
-            
             leaderboard.addMemberTo("leaderboard_name", "member", 1337) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
 
@@ -100,8 +80,26 @@ class LeaderboardSpec extends Spec
 
             leaderboard.addMemberTo("leaderboard_name", "another_member", 1339) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(2)
-                        
-            leaderboard.disconnect
+         }
+    }
+    
+    describe("totalPages and totalPagesIn") {
+        it("should return the correct number of pages in the leaderboard using totalPages for a single page") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.totalPages("leaderboard_name") should equal(1)
+        }
+
+        it("should return the correct number of pages in the leaderboard using totalPages") {
+            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
+            
+            leaderboard.totalPages("leaderboard_name") should equal(2)
+        }
+
+        it("should return the correct number of pages in the leaderboard using totalPagesIn") {
+            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
+            
+            leaderboard.totalPagesIn("leaderboard_name", LeaderboardDefaults.DEFAULT_PAGE_SIZE) should equal(2)
         }
     }
 }

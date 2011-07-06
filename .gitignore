@@ -4,3 +4,4 @@ project/boot
 target
 target/
 target/**/*
+*.rdb
