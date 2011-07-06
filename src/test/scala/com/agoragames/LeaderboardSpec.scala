@@ -75,4 +75,33 @@ class LeaderboardSpec extends Spec
             leaderboard.disconnect
         }
     }
+    
+    describe("addMember and addMemberTo") {
+        it("should be able to add a member to the leaderboard using addMember") {
+            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
+            
+            leaderboard.addMember("member", 1337) should equal(true)
+            leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
+
+            leaderboard.addMember("member", 1338) should equal(false)
+            leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
+                        
+            leaderboard.disconnect
+        }
+
+        it("should be able to add a member to the leaderboard using addMemberTo") {
+            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
+            
+            leaderboard.addMemberTo("leaderboard_name", "member", 1337) should equal(true)
+            leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
+
+            leaderboard.addMemberTo("leaderboard_name", "member", 1338) should equal(false)
+            leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
+
+            leaderboard.addMemberTo("leaderboard_name", "another_member", 1339) should equal(true)
+            leaderboard.totalMembersIn("leaderboard_name").get should equal(2)
+                        
+            leaderboard.disconnect
+        }
+    }
 }

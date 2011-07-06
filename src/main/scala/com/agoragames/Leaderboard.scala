@@ -32,4 +32,12 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
     def totalMembers: Option[Int] = {
         this.totalMembersIn(this.leaderboardName)
     }
+    
+    def addMemberTo(leaderboardName:String, memberName: String, score: Double): Boolean = {
+        redisClient.zadd(leaderboardName, score, memberName)
+    }
+    
+    def addMember(memberName:String, score: Double): Boolean = {
+        this.addMemberTo(this.leaderboardName, memberName, score)
+    }
 }
