@@ -10,7 +10,7 @@ object LeaderboardDefaults {
 	
 }
 
-class Leaderboard(leaderboardNameParam:String, host: String, port: Int, pageSizeParam: Int) {
+class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSizeParam: Int) {
 	private val redisClient = new RedisClient(host, port)
 	
 	val leaderboardName: String = leaderboardNameParam
@@ -23,5 +23,13 @@ class Leaderboard(leaderboardNameParam:String, host: String, port: Int, pageSize
 	
 	def disconnect: Boolean = {
 	    redisClient.disconnect
+    }
+    
+    def totalMembersIn(leaderboardName: String): Option[Int] = {
+        redisClient.zcard(leaderboardName)
+    }
+    
+    def totalMembers: Option[Int] = {
+        this.totalMembersIn(this.leaderboardName)
     }
 }
