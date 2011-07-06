@@ -20,4 +20,8 @@ class Leaderboard(leaderboardNameParam:String, host: String, port: Int, pageSize
 	if (pageSize < 1) {
 	    pageSize = LeaderboardDefaults.DEFAULT_PAGE_SIZE
 	}
+	
+	def disconnect: Boolean = {
+	    redisClient.disconnect
+    }
 }

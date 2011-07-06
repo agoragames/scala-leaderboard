@@ -44,4 +44,12 @@ class LeaderboardSpec extends Spec
             leaderboard.pageSize should equal(25)
         }
     }
+    
+    describe("disconnect") {
+        it("should be able to disconnect from Redis") {
+            var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
+            
+            leaderboard.disconnect should equal(true)
+        }
+    }
 }
