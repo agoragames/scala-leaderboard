@@ -211,5 +211,48 @@ class LeaderboardSpec extends Spec
             leaders.get(0)._2 should equal(25.0)
             leaders.get(0)._3 should equal(1)
         }
+        
+        it("should return the correct leaders with multiple pages") {
+            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            
+            leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            
+            var leaders:java.util.List[(String, Double, Int)] = leaderboard.leaders(1)
+            println(leaders)
+            
+            leaders.size should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+            
+            leaders = leaderboard.leaders(2)
+            leaders.size should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+
+            leaders = leaderboard.leaders(3)
+            leaders.size should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+
+            leaders = leaderboard.leaders(4)
+            leaders.size should equal(1)
+
+            leaders = leaderboard.leaders(-5)
+            leaders.size should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+
+            leaders = leaderboard.leaders(10)
+            leaders.size should equal(1)
+        }
+    }
+    
+    describe("aroundMe and aroundMeIn") {
+        it("should return the correct leaders around me when calling aroundMe") {
+            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            
+            leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            
+            var leadersAroundMe:java.util.List[(String, Double, Int)] = leaderboard.aroundMe("member_30")
+            (leadersAroundMe.size / 2) should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE / 2)
+
+            leadersAroundMe = leaderboard.aroundMe("member_1")
+            (leadersAroundMe.size) should equal((LeaderboardDefaults.DEFAULT_PAGE_SIZE / 2) + 1)
+
+            leadersAroundMe = leaderboard.aroundMe("member_76")
+            (leadersAroundMe.size / 2) should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE / 2)
+        }
     }
 }

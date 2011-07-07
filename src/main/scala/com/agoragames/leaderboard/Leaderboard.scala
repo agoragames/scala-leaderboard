@@ -136,8 +136,8 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
         if (startingOffset < 0) {
             startingOffset = 0
         }
-        var endingOffset: Int = (startingOffset + pageSize) + 1
-        
+        var endingOffset: Int = (startingOffset + pageSize) - 1
+                
         var rawLeaderData = redisClient.zrangeWithScore(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
 
         var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]        
@@ -147,6 +147,30 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
             }
         }
         
+        massagedLeaderData
+    }
+    
+    def aroundMe(member: String, withScores: Boolean = true, withRank: Boolean = true, useZeroIndexForRank: Boolean = false, pageSize: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE): java.util.List[(String, Double, Int)] = {
+        this.aroundMeIn(this.leaderboardName, member, withScores, withRank, useZeroIndexForRank, pageSize)      
+    }
+    
+    def aroundMeIn(leaderboardName: String, member: String, withScores: Boolean = true, withRank: Boolean = true, useZeroIndexForRank: Boolean = false, pageSize: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE): java.util.List[(String, Double, Int)] = {
+        var reverseRankForMember: Int = redisClient.zrank(leaderboardName, member, true).get
+
+        var startingOffset: Int = reverseRankForMember - (pageSize / 2)
+        if (startingOffset < 0) {
+          startingOffset = 0
+        }
+        var endingOffset = (startingOffset + pageSize) - 1
+
+        var rawLeaderData = redisClient.zrangeWithScore(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
+        var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]        
+        if (rawLeaderData != None) {
+          for (leader <- rawLeaderData.get) {
+              massagedLeaderData.add((leader._1, leader._2, rankForIn(leaderboardName, leader._1, useZeroIndexForRank).get))
+          }
+        }
+
         massagedLeaderData
     }
 }
