@@ -141,4 +141,21 @@ class LeaderboardSpec extends Spec
             leaderboard.changeScoreForIn("leaderboard_name", "member_3", -3).get should equal(6.0)
         }
     }
+    
+    describe("checkMember and checkMemberIn") {
+        it("should return whether or not a member is in the leaderboard using checkMember") {
+            addMembersToLeaderboard(5)
+
+            leaderboard.totalMembers.get should equal(5)
+            leaderboard.checkMember("member_3") should equal(true)
+            leaderboard.checkMember("member_10") should equal(false)
+        }
+
+        it("should return whether or not a member is in the leaderboard using checkMemberIn") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.checkMemberIn("leaderboard_name", "member_3") should equal(true)
+            leaderboard.checkMemberIn("leaderboard_name", "member_10") should equal(false)
+        }
+    }
 }

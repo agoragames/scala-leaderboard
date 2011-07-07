@@ -73,4 +73,12 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
     def changeScoreForIn(leaderboardName: String, member: String, score: Double): Option[Double] = {
         redisClient.zincrby(leaderboardName, score, member)
     }
+
+    def checkMember(member: String): Boolean = {
+        this.checkMemberIn(this.leaderboardName, member)
+    }
+
+    def checkMemberIn(leaderboardName: String, member: String): Boolean = {
+        !(redisClient.zscore(leaderboardName, member) == None)
+    }
 }
