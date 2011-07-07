@@ -1,4 +1,4 @@
-name := "RedisClient"
+name := "scala-leaderboard"
 
 version := "1.0.0"
 

@@ -218,7 +218,6 @@ class LeaderboardSpec extends Spec
             leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
             var leaders:java.util.List[(String, Double, Int)] = leaderboard.leaders(1)
-            println(leaders)
             
             leaders.size should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
             
