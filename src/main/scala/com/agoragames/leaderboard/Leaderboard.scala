@@ -115,4 +115,38 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
     def removeMembersInScoreRangeIn(leaderboardName: String, minScore: Double, maxScore: Double): Option[Int] = {
         redisClient.zremrangebyscore(leaderboardName, minScore, maxScore)
     }
+    
+    def leaders(currentPage: Int, withScores: Boolean = true, withRank: Boolean = true, useZeroIndexForRank: Boolean = false, pageSize: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE) = {
+        this.leadersIn(this.leaderboardName, currentPage, withScores, withRank, useZeroIndexForRank, pageSize)
+    }
+    
+    def leadersIn(leaderboardName: String, currentPageParam: Int, withScores: Boolean = true, withRank: Boolean = true, useZeroIndexForRank: Boolean = false, pageSize: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE): java.util.List[(String, Double, Int)] = {
+        var currentPage: Int = currentPageParam
+        
+        if (currentPage < 1) {
+            currentPage = 1
+        }
+        
+        if (currentPage > totalPagesIn(leaderboardName, pageSize)) {
+            currentPage = totalPagesIn(leaderboardName, pageSize)
+        }
+        
+        var indexForRedis: Int = currentPage - 1
+        var startingOffset: Int = (indexForRedis * pageSize)
+        if (startingOffset < 0) {
+            startingOffset = 0
+        }
+        var endingOffset: Int = (startingOffset + pageSize) + 1
+        
+        var rawLeaderData = redisClient.zrangeWithScore(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
+
+        var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]        
+        if (rawLeaderData != None) {
+            for (leader <- rawLeaderData.get) {
+                massagedLeaderData.add((leader._1, leader._2, rankForIn(leaderboardName, leader._1, useZeroIndexForRank).get))
+            }
+        }
+        
+        massagedLeaderData
+    }
 }

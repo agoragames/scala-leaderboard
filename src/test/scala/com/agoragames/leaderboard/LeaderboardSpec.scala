@@ -172,7 +172,7 @@ class LeaderboardSpec extends Spec
         it("should return the correct rank and score for scoreAndRankFor") {
             addMembersToLeaderboard(5)
             
-            val dataMap: scala.collection.mutable.HashMap[String, Object] = leaderboard.scoreAndRankFor("member_1")
+            var dataMap: scala.collection.mutable.HashMap[String, Object] = leaderboard.scoreAndRankFor("member_1")
             
             dataMap("member") should equal("member_1")
             dataMap("score").asInstanceOf[Option[Double]].get should equal(1.0)
@@ -195,6 +195,21 @@ class LeaderboardSpec extends Spec
             leaderboard.removeMembersInScoreRange(100, 102)
 
             leaderboard.totalMembers.get should equal(5)            
+        }
+    }
+    
+    describe("leaders and leadersIn") {
+        it("should return the correct leaders in the leaderboard when calling leaders") {
+            addMembersToLeaderboard(25)
+            
+            leaderboard.totalMembers.get should equal(25)
+            
+            var leaders:java.util.List[(String, Double, Int)] = leaderboard.leaders(1)
+            
+            leaders.size should equal(25)
+            leaders.get(0)._1 should equal("member_25")
+            leaders.get(0)._2 should equal(25.0)
+            leaders.get(0)._3 should equal(1)
         }
     }
 }
