@@ -108,4 +108,12 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
         
         dataMap
     }
+
+    def removeMembersInScoreRange(minScore: Double, maxScore: Double): Option[Int] = {
+        this.removeMembersInScoreRangeIn(this.leaderboardName, minScore, maxScore)
+    }
+    
+    def removeMembersInScoreRangeIn(leaderboardName: String, minScore: Double, maxScore: Double): Option[Int] = {
+        redisClient.zremrangebyscore(leaderboardName, minScore, maxScore)
+    }
 }

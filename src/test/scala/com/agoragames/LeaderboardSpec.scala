@@ -159,7 +159,7 @@ class LeaderboardSpec extends Spec
         }
     }
     
-    describe("rankFor") {
+    describe("rankFor and rankForIn") {
         it("should return the correct rank for rankFor") {
             addMembersToLeaderboard(5)
             
@@ -168,7 +168,7 @@ class LeaderboardSpec extends Spec
         }
     }
     
-    describe("scoreAndRankFor") {
+    describe("scoreAndRankFor and scoreAndRankForIn") {
         it("should return the correct rank and score for scoreAndRankFor") {
             addMembersToLeaderboard(5)
             
@@ -177,6 +177,24 @@ class LeaderboardSpec extends Spec
             dataMap("member") should equal("member_1")
             dataMap("score").asInstanceOf[Option[Double]].get should equal(1.0)
             dataMap("rank").asInstanceOf[Option[Int]].get should equal(5)
+        }
+    }
+    
+    describe("removeMembersInScoreRange and removeMembersInScoreRangeIn") {
+        it("should return the correct number of members removed for removeMembersInScoreRange") {
+            addMembersToLeaderboard(5)
+
+            leaderboard.totalMembers.get should equal(5)
+
+            leaderboard.addMember("cheater_1", 100)
+            leaderboard.addMember("cheater_2", 101)
+            leaderboard.addMember("cheater_3", 102)
+
+            leaderboard.totalMembers.get should equal(8)
+
+            leaderboard.removeMembersInScoreRange(100, 102)
+
+            leaderboard.totalMembers.get should equal(5)            
         }
     }
 }
