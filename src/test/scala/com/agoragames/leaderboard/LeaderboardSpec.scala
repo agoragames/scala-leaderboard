@@ -1,4 +1,4 @@
-package com.agoragames
+package com.agoragames.leaderboard
 
 import org.scalatest.Spec
 import org.scalatest.BeforeAndAfterEach

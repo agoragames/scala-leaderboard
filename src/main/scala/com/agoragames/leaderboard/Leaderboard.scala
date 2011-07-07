@@ -1,4 +1,4 @@
-package com.agoragames
+package com.agoragames.leaderboard
 
 import com.redis._
 
@@ -6,11 +6,10 @@ object LeaderboardDefaults {
     val VERSION = "1.0.0"
 	val DEFAULT_PAGE_SIZE = 25
 	val DEFAULT_REDIS_HOST = "localhost"
-	val DEFAULT_REDIS_PORT = 6379
-	
+	val DEFAULT_REDIS_PORT = 6379	
 }
 
-class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSizeParam: Int) {
+class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaults.DEFAULT_REDIS_HOST, port: Int = LeaderboardDefaults.DEFAULT_REDIS_PORT, pageSizeParam: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE) {
 	private val redisClient = new RedisClient(host, port)
 	
 	val leaderboardName: String = leaderboardNameParam
