@@ -255,4 +255,32 @@ class LeaderboardSpec extends Spec
             (leadersAroundMe.size / 2) should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE / 2)
         }
     }
+    
+    describe("rankedInList and rankedInListIn") {
+        it("should return the correct rank and score information when calling rankedInList") {
+            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+            
+            leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+            
+            var members: Array[String] = new Array[String](3)
+            members(0) = "member_1"
+            members(1) = "member_5"
+            members(2) = "member_10"
+            var rankedMembers:java.util.List[(String, Double, Int)] = leaderboard.rankedInList(members)
+            
+            rankedMembers.size should equal(3)
+            
+            rankedMembers.get(0)._1 should equal("member_1")
+            rankedMembers.get(0)._2 should equal(1)
+            rankedMembers.get(0)._3 should equal(25.0)
+
+            rankedMembers.get(1)._1 should equal("member_5")
+            rankedMembers.get(1)._2 should equal(5.0)
+            rankedMembers.get(1)._3 should equal(21)
+
+            rankedMembers.get(2)._1 should equal("member_10")
+            rankedMembers.get(2)._2 should equal(10.0)
+            rankedMembers.get(2)._3 should equal(16)
+        }
+    }
 }

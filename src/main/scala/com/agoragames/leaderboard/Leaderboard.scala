@@ -173,4 +173,19 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
 
         massagedLeaderData
     }
+    
+    def rankedInList(members: Array[String], withScores: Boolean = true, useZeroIndexForRank: Boolean = false): java.util.List[(String, Double, Int)] = {
+        rankedInListIn(this.leaderboardName, members, withScores, useZeroIndexForRank)
+    }
+    
+    def rankedInListIn(leaderboardName: String, members: Array[String], withScores: Boolean = true, useZeroIndexForRank: Boolean = false): java.util.List[(String, Double, Int)] = {
+        var ranksForMembers: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]
+        
+        for (member <- members) {
+            var memberData: (String, Double, Int) = (member, scoreForIn(leaderboardName, member).get, rankForIn(leaderboardName, member, useZeroIndexForRank).get)
+            ranksForMembers.add(memberData)
+        }
+        
+        ranksForMembers
+    }
 }
