@@ -158,4 +158,13 @@ class LeaderboardSpec extends Spec
             leaderboard.checkMemberIn("leaderboard_name", "member_10") should equal(false)
         }
     }
+    
+    describe("rankFor") {
+        it("should return the correct rank for rankFor") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.rankFor("member_4").get should equal(2)
+            leaderboard.rankFor("member_4", true).get should equal(1)
+        }
+    }
 }

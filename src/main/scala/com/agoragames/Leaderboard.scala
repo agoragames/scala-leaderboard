@@ -81,4 +81,17 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
     def checkMemberIn(leaderboardName: String, member: String): Boolean = {
         !(redisClient.zscore(leaderboardName, member) == None)
     }
+
+    def rankFor(member: String, useZeroIndexForRank: Boolean = false): Option[Int] = {
+        this.rankForIn(this.leaderboardName, member, useZeroIndexForRank)
+    }
+    
+    def rankForIn(leaderboardName: String, member: String, useZeroIndexForRank: Boolean = false): Option[Int] = {
+        if (useZeroIndexForRank) {
+            redisClient.zrank(leaderboardName, member, true)            
+        } else {
+            // This feels "not elegant"
+            Some(new Integer(redisClient.zrank(leaderboardName, member, true).get + 1))
+        }
+    }
 }
