@@ -15,27 +15,27 @@ class LeaderboardSpec extends Spec
                         with BeforeAndAfterEach
                         with BeforeAndAfterAll {
 
-	val redisClient = new RedisClient("localhost", 6379)
+    val redisClient = new RedisClient("localhost", 6379)
     var leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25)
 
-	override def beforeEach = {
-		redisClient.flushdb
-	}
+    override def beforeEach = {
+        redisClient.flushdb
+    }
 
-	override def afterEach = {
-	}
+    override def afterEach = {
+    }
 
-	override def afterAll = {
-		redisClient.disconnect
-		leaderboard.disconnect
-	}
-	
-	private def addMembersToLeaderboard(totalMembers: Int) = {
-		for (i <- 1 to totalMembers) {
-			leaderboard.addMember("member_" + i, i)
-		}
-	}
-	
+    override def afterAll = {
+        redisClient.disconnect
+        leaderboard.disconnect
+    }
+    
+    private def addMembersToLeaderboard(totalMembers: Int) = {
+        for (i <- 1 to totalMembers) {
+            leaderboard.addMember("member_" + i, i)
+        }
+    }
+    
     describe("version") {
       it("should be the correct version") {
           
