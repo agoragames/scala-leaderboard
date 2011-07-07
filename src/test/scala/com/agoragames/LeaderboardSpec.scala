@@ -167,4 +167,16 @@ class LeaderboardSpec extends Spec
             leaderboard.rankFor("member_4", true).get should equal(1)
         }
     }
+    
+    describe("scoreAndRankFor") {
+        it("should return the correct rank and score for scoreAndRankFor") {
+            addMembersToLeaderboard(5)
+            
+            val dataMap: scala.collection.mutable.HashMap[String, Object] = leaderboard.scoreAndRankFor("member_1")
+            
+            dataMap("member") should equal("member_1")
+            dataMap("score").asInstanceOf[Option[Double]].get should equal(1.0)
+            dataMap("rank").asInstanceOf[Option[Int]].get should equal(5)
+        }
+    }
 }

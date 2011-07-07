@@ -91,7 +91,21 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
             redisClient.zrank(leaderboardName, member, true)            
         } else {
             // This feels "not elegant"
-            Some(new Integer(redisClient.zrank(leaderboardName, member, true).get + 1))
+            Some(new java.lang.Integer(redisClient.zrank(leaderboardName, member, true).get + 1))
         }
+    }
+    
+    def scoreAndRankFor(member: String, useZeroIndexForRank: Boolean = false): scala.collection.mutable.HashMap[String, Object] = {
+        this.scoreAndRankForIn(this.leaderboardName, member, useZeroIndexForRank)
+    }
+    
+    def scoreAndRankForIn(leaderboardName: String, member: String, useZeroIndexForRank: Boolean = false): scala.collection.mutable.HashMap[String, Object] = {
+        val dataMap = scala.collection.mutable.HashMap.empty[String, Object]
+        
+        dataMap += ("member" -> member)
+        dataMap += ("score" -> this.scoreForIn(leaderboardName, member))
+        dataMap += ("rank" -> this.rankForIn(leaderboardName, member, useZeroIndexForRank))
+        
+        dataMap
     }
 }
