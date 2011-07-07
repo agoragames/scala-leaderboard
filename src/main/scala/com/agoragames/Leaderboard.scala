@@ -33,19 +33,44 @@ class Leaderboard(leaderboardNameParam: String, host: String, port: Int, pageSiz
         redisClient.zcard(leaderboardName)
     }
 
-    def addMember(memberName:String, score: Double): Boolean = {
+    def addMember(memberName: String, score: Double): Boolean = {
         this.addMemberTo(this.leaderboardName, memberName, score)
     }
     
-    def addMemberTo(leaderboardName:String, memberName: String, score: Double): Boolean = {
+    def addMemberTo(leaderboardName: String, memberName: String, score: Double): Boolean = {
         redisClient.zadd(leaderboardName, score, memberName)
     }
     
-    def totalPages(leaderboardName:String): Int = {
+    def totalPages(leaderboardName: String): Int = {
         this.totalPagesIn(this.leaderboardName, this.pageSize)
     }
     
-    def totalPagesIn(leaderboardName:String, pageSize: Int): Int = {
+    def totalPagesIn(leaderboardName: String, pageSize: Int): Int = {
 		scala.math.ceil(this.totalMembersIn(leaderboardName).get.asInstanceOf[Float] / pageSize.asInstanceOf[Float]).asInstanceOf[Int]
+    }
+
+    // RedisClient does not currently support zcount.
+    // def totalMembersInScoreRange(minScore: Double, maxScore: Double): Int = {
+    //     this.totalMembersInScoreRangeIn(this.leaderboardName, minScore, maxScore)
+    // }
+    // 
+    // def totalMembersInScoreRangeIn(leaderboardName: String, minScore: Double, maxScore: Double): Int = {
+    //     redisClient.zcount(leaderboardName, minScore, maxScore)
+    // }
+    
+    def scoreFor(member: String): Option[Double] = {
+        this.scoreForIn(this.leaderboardName, member)
+    }
+    
+    def scoreForIn(leaderboardName: String, member: String): Option[Double] = {
+        redisClient.zscore(leaderboardName, member)
+    }
+    
+    def changeScoreFor(member: String, score: Double): Option[Double] = {
+        return changeScoreForIn(this.leaderboardName, member, score)
+    }
+    
+    def changeScoreForIn(leaderboardName: String, member: String, score: Double): Option[Double] = {
+        redisClient.zincrby(leaderboardName, score, member)
     }
 }

@@ -102,4 +102,43 @@ class LeaderboardSpec extends Spec
             leaderboard.totalPagesIn("leaderboard_name", LeaderboardDefaults.DEFAULT_PAGE_SIZE) should equal(2)
         }
     }
+    
+    // RedisClient does not currently support zcount.
+    // describe("totalMembersInScoreRange and totalMembersInScoreRangeIn") {
+    //     it("should return correct number of members for totalMembersInScoreRange") {
+    //         addMembersToLeaderboard(5)
+    //         
+    //         leaderboard.totalMembersInScoreRange(2, 4) should equal(3)
+    //     }
+    // }
+    
+    describe("scoreFor and scoreforIn") {
+        it("should return the correct score for a member using scoreFor") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.scoreFor("member_3").get should equal(3.0)
+        }
+
+        it("should return the correct score for a member using scoreForIn") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.scoreForIn("leaderboard_name", "member_3").get should equal(3.0)
+        }
+    }
+
+    describe("changeScoreFor and changeScoreforIn") {
+        it("should return the correct score for a member using changeScoreFor") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.changeScoreFor("member_3", 6).get should equal(9.0)
+            leaderboard.changeScoreFor("member_3", -3).get should equal(6.0)
+        }
+
+        it("should return the correct score for a member using changeScoreForIn") {
+            addMembersToLeaderboard(5)
+            
+            leaderboard.changeScoreForIn("leaderboard_name", "member_3", 6).get should equal(9.0)
+            leaderboard.changeScoreForIn("leaderboard_name", "member_3", -3).get should equal(6.0)
+        }
+    }
 }
