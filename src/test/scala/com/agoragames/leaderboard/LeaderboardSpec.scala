@@ -89,6 +89,20 @@ class LeaderboardSpec extends Spec
             
             leaderboard.totalPages("leaderboard_name") should equal(1)
         }
+        
+        it("should return the correct number of pages in the given leaderboard") {
+          var other_board = new Leaderboard("another_leaderboard", "localhost", 6379, 25)
+          for (i <- 1 to 5) {
+              other_board.addMember("member_" + i, i)
+          }
+          leaderboard.totalPages("another_leaderboard") should equal(1)
+        }
+        
+        it("should allow you to call totalPages without an argument, defaulting to the current board") {
+          addMembersToLeaderboard(5)
+          
+          leaderboard.totalPages() should equal(1)
+        }
 
         it("should return the correct number of pages in the leaderboard using totalPages") {
             addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
