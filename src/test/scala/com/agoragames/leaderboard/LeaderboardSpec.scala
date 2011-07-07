@@ -87,13 +87,13 @@ class LeaderboardSpec extends Spec
         it("should return the correct number of pages in the leaderboard using totalPages for a single page") {
             addMembersToLeaderboard(5)
             
-            leaderboard.totalPages("leaderboard_name") should equal(1)
+            leaderboard.totalPages should equal(1)
         }
 
         it("should return the correct number of pages in the leaderboard using totalPages") {
             addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
             
-            leaderboard.totalPages("leaderboard_name") should equal(2)
+            leaderboard.totalPages should equal(2)
         }
 
         it("should return the correct number of pages in the leaderboard using totalPagesIn") {
