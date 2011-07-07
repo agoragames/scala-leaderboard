@@ -40,8 +40,8 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
         redisClient.zadd(leaderboardName, score, memberName)
     }
     
-    def totalPages(leaderboardName: String): Int = {
-        this.totalPagesIn(this.leaderboardName, this.pageSize)
+    def totalPages(leaderboardName: String = this.leaderboardName): Int = {
+        this.totalPagesIn(leaderboardName, this.pageSize)
     }
     
     def totalPagesIn(leaderboardName: String, pageSize: Int): Int = {
