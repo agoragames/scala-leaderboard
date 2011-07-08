@@ -83,6 +83,16 @@ class LeaderboardSpec extends Spec
          }
     }
     
+    describe("removeMember and removeMemberFrom") {
+        it("should remove a member if they were added to a leaderboard") {
+            leaderboard.addMember("member", 1337) should equal(true)
+            leaderboard.totalMembers.get should equal(1)
+            
+            leaderboard.removeMember("member")
+            leaderboard.totalMembers.get should equal(0)
+        }
+    }
+    
     describe("totalPages and totalPagesIn") {
         it("should return the correct number of pages in the leaderboard using totalPages for a single page") {
             addMembersToLeaderboard(5)

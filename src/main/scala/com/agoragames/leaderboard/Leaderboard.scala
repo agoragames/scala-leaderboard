@@ -40,6 +40,14 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
         redisClient.zadd(leaderboardName, score, memberName)
     }
     
+    def removeMember(memberName: String): Boolean = {
+        this.removeMemberFrom(this.leaderboardName, memberName)
+    }
+    
+    def removeMemberFrom(leaderboardName: String, memberName: String): Boolean = {
+        redisClient.zrem(leaderboardName, memberName)
+    }
+    
     def totalPages: Int = {
         this.totalPagesIn(this.leaderboardName, this.pageSize)
     }
