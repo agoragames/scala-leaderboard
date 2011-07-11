@@ -74,7 +74,7 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
     }
     
     def changeScoreFor(member: String, score: Double): Option[Double] = {
-        return changeScoreForIn(this.leaderboardName, member, score)
+        this.changeScoreForIn(this.leaderboardName, member, score)
     }
     
     def changeScoreForIn(leaderboardName: String, member: String, score: Double): Option[Double] = {
