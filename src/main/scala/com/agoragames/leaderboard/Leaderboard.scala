@@ -3,7 +3,7 @@ package com.agoragames.leaderboard
 import com.redis._
 
 object LeaderboardDefaults {
-    val VERSION = "1.0.0"
+    val VERSION = "2.0.0"
     val DEFAULT_PAGE_SIZE = 25
     val DEFAULT_REDIS_HOST = "localhost"
     val DEFAULT_REDIS_PORT = 6379   
@@ -23,6 +23,14 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
     def disconnect: Boolean = {
         redisClient.disconnect
     }
+    
+    def deleteLeaderboard: Option[Int] = {
+        this.deleteLeaderboardNamed(this.leaderboardName)    
+    }
+    
+    def deleteLeaderboardNamed(leaderboardName: String): Option[Int] = {
+        redisClient.del(leaderboardName)
+    }
         
     def totalMembers: Option[Int] = {
         this.totalMembersIn(this.leaderboardName)
@@ -32,11 +40,11 @@ class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaul
         redisClient.zcard(leaderboardName)
     }
 
-    def addMember(memberName: String, score: Double): Boolean = {
-        this.addMemberTo(this.leaderboardName, memberName, score)
+    def rankMember(memberName: String, score: Double): Boolean = {
+        this.rankMemberIn(this.leaderboardName, memberName, score)
     }
     
-    def addMemberTo(leaderboardName: String, memberName: String, score: Double): Boolean = {
+    def rankMemberIn(leaderboardName: String, memberName: String, score: Double): Boolean = {
         redisClient.zadd(leaderboardName, score, memberName)
     }
     

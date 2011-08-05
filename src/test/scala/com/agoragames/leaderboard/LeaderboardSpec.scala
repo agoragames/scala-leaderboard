@@ -30,16 +30,16 @@ class LeaderboardSpec extends Spec
         leaderboard.disconnect
     }
     
-    private def addMembersToLeaderboard(totalMembers: Int) = {
+    private def rankMembersInLeaderboard(totalMembers: Int) = {
         for (i <- 1 to totalMembers) {
-            leaderboard.addMember("member_" + i, i)
+            leaderboard.rankMember("member_" + i, i)
         }
     }
     
     describe("version") {
       it("should be the correct version") {
           
-          leaderboard.version should equal("1.0.0")
+          leaderboard.version should equal("2.0.0")
       }
     }
     
@@ -47,6 +47,16 @@ class LeaderboardSpec extends Spec
         it("should have the correct parameters") {
             leaderboard.leaderboardName should equal("leaderboard_name")
             leaderboard.pageSize should equal(25)
+        }
+    }
+    
+    describe("deleteLeaderboard and deleteLeaderboardNames") {
+        it("should be able to delete the named leaderboard") {
+            rankMembersInLeaderboard(5)
+            
+            redisClient.exists("leaderboard_name") should equal(true)
+            leaderboard.deleteLeaderboard
+            redisClient.exists("leaderboard_name") should equal(false)            
         }
     }
         
@@ -62,30 +72,30 @@ class LeaderboardSpec extends Spec
         }
     }
     
-    describe("addMember and addMemberTo") {
-        it("should be able to add a member to the leaderboard using addMember") {        
-            leaderboard.addMember("member", 1337) should equal(true)
+    describe("rankMember and rankMemberIn") {
+        it("should be able to add a member to the leaderboard using rankMember") {        
+            leaderboard.rankMember("member", 1337) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
 
-            leaderboard.addMember("member", 1338) should equal(false)
+            leaderboard.rankMember("member", 1338) should equal(false)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
         }
 
-        it("should be able to add a member to the leaderboard using addMemberTo") {
-            leaderboard.addMemberTo("leaderboard_name", "member", 1337) should equal(true)
+        it("should be able to add a member to the leaderboard using rankMemberIn") {
+            leaderboard.rankMemberIn("leaderboard_name", "member", 1337) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
 
-            leaderboard.addMemberTo("leaderboard_name", "member", 1338) should equal(false)
+            leaderboard.rankMemberIn("leaderboard_name", "member", 1338) should equal(false)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(1)
 
-            leaderboard.addMemberTo("leaderboard_name", "another_member", 1339) should equal(true)
+            leaderboard.rankMemberIn("leaderboard_name", "another_member", 1339) should equal(true)
             leaderboard.totalMembersIn("leaderboard_name").get should equal(2)
          }
     }
     
     describe("removeMember and removeMemberFrom") {
         it("should remove a member if they were added to a leaderboard") {
-            leaderboard.addMember("member", 1337) should equal(true)
+            leaderboard.rankMember("member", 1337) should equal(true)
             leaderboard.totalMembers.get should equal(1)
             
             leaderboard.removeMember("member")
@@ -95,19 +105,19 @@ class LeaderboardSpec extends Spec
     
     describe("totalPages and totalPagesIn") {
         it("should return the correct number of pages in the leaderboard using totalPages for a single page") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.totalPages should equal(1)
         }
 
         it("should return the correct number of pages in the leaderboard using totalPages") {
-            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
+            rankMembersInLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
             
             leaderboard.totalPages should equal(2)
         }
 
         it("should return the correct number of pages in the leaderboard using totalPagesIn") {
-            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
+            rankMembersInLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE + 2)
             
             leaderboard.totalPagesIn("leaderboard_name", LeaderboardDefaults.DEFAULT_PAGE_SIZE) should equal(2)
         }
@@ -116,7 +126,7 @@ class LeaderboardSpec extends Spec
     // RedisClient does not currently support zcount.
     // describe("totalMembersInScoreRange and totalMembersInScoreRangeIn") {
     //     it("should return correct number of members for totalMembersInScoreRange") {
-    //         addMembersToLeaderboard(5)
+    //         rankMembersInLeaderboard(5)
     //         
     //         leaderboard.totalMembersInScoreRange(2, 4) should equal(3)
     //     }
@@ -124,13 +134,13 @@ class LeaderboardSpec extends Spec
     
     describe("scoreFor and scoreforIn") {
         it("should return the correct score for a member using scoreFor") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.scoreFor("member_3").get should equal(3.0)
         }
 
         it("should return the correct score for a member using scoreForIn") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.scoreForIn("leaderboard_name", "member_3").get should equal(3.0)
         }
@@ -138,14 +148,14 @@ class LeaderboardSpec extends Spec
 
     describe("changeScoreFor and changeScoreforIn") {
         it("should return the correct score for a member using changeScoreFor") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.changeScoreFor("member_3", 6).get should equal(9.0)
             leaderboard.changeScoreFor("member_3", -3).get should equal(6.0)
         }
 
         it("should return the correct score for a member using changeScoreForIn") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.changeScoreForIn("leaderboard_name", "member_3", 6).get should equal(9.0)
             leaderboard.changeScoreForIn("leaderboard_name", "member_3", -3).get should equal(6.0)
@@ -154,7 +164,7 @@ class LeaderboardSpec extends Spec
     
     describe("checkMember and checkMemberIn") {
         it("should return whether or not a member is in the leaderboard using checkMember") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
 
             leaderboard.totalMembers.get should equal(5)
             leaderboard.checkMember("member_3") should equal(true)
@@ -162,7 +172,7 @@ class LeaderboardSpec extends Spec
         }
 
         it("should return whether or not a member is in the leaderboard using checkMemberIn") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.checkMemberIn("leaderboard_name", "member_3") should equal(true)
             leaderboard.checkMemberIn("leaderboard_name", "member_10") should equal(false)
@@ -171,7 +181,7 @@ class LeaderboardSpec extends Spec
     
     describe("rankFor and rankForIn") {
         it("should return the correct rank for rankFor") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             leaderboard.rankFor("member_4").get should equal(2)
             leaderboard.rankFor("member_4", true).get should equal(1)
@@ -180,7 +190,7 @@ class LeaderboardSpec extends Spec
     
     describe("scoreAndRankFor and scoreAndRankForIn") {
         it("should return the correct rank and score for scoreAndRankFor") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
             
             var dataMap: scala.collection.mutable.HashMap[String, Object] = leaderboard.scoreAndRankFor("member_1")
             
@@ -192,13 +202,13 @@ class LeaderboardSpec extends Spec
     
     describe("removeMembersInScoreRange and removeMembersInScoreRangeIn") {
         it("should return the correct number of members removed for removeMembersInScoreRange") {
-            addMembersToLeaderboard(5)
+            rankMembersInLeaderboard(5)
 
             leaderboard.totalMembers.get should equal(5)
 
-            leaderboard.addMember("cheater_1", 100)
-            leaderboard.addMember("cheater_2", 101)
-            leaderboard.addMember("cheater_3", 102)
+            leaderboard.rankMember("cheater_1", 100)
+            leaderboard.rankMember("cheater_2", 101)
+            leaderboard.rankMember("cheater_3", 102)
 
             leaderboard.totalMembers.get should equal(8)
 
@@ -210,7 +220,7 @@ class LeaderboardSpec extends Spec
     
     describe("leaders and leadersIn") {
         it("should return the correct leaders in the leaderboard when calling leaders") {
-            addMembersToLeaderboard(25)
+            rankMembersInLeaderboard(25)
             
             leaderboard.totalMembers.get should equal(25)
             
@@ -223,7 +233,7 @@ class LeaderboardSpec extends Spec
         }
         
         it("should return the correct leaders with multiple pages") {
-            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            rankMembersInLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
             leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
@@ -250,7 +260,7 @@ class LeaderboardSpec extends Spec
     
     describe("aroundMe and aroundMeIn") {
         it("should return the correct leaders around me when calling aroundMe") {
-            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
+            rankMembersInLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
             leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
@@ -267,7 +277,7 @@ class LeaderboardSpec extends Spec
     
     describe("rankedInList and rankedInListIn") {
         it("should return the correct rank and score information when calling rankedInList") {
-            addMembersToLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
+            rankMembersInLeaderboard(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
             
             leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE)
             
