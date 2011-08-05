@@ -48,6 +48,12 @@ class LeaderboardSpec extends Spec
             leaderboard.leaderboardName should equal("leaderboard_name")
             leaderboard.pageSize should equal(25)
         }
+        
+        it("should be able to use an existing RedisClient instance") {
+            leaderboard = new Leaderboard("leaderboard_name", "localhost", 6379, 25, scala.collection.mutable.HashMap[String, Object]("redis_connection" -> redisClient))
+            rankMembersInLeaderboard(5)
+            leaderboard.totalMembers.get should equal(5)
+        }
     }
     
     describe("deleteLeaderboard and deleteLeaderboardNames") {

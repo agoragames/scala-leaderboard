@@ -9,8 +9,18 @@ object LeaderboardDefaults {
     val DEFAULT_REDIS_PORT = 6379   
 }
 
-class Leaderboard(leaderboardNameParam: String, host: String = LeaderboardDefaults.DEFAULT_REDIS_HOST, port: Int = LeaderboardDefaults.DEFAULT_REDIS_PORT, pageSizeParam: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE) {
-    private val redisClient = new RedisClient(host, port)
+class Leaderboard(leaderboardNameParam: String, 
+        host: String = LeaderboardDefaults.DEFAULT_REDIS_HOST, 
+        port: Int = LeaderboardDefaults.DEFAULT_REDIS_PORT, 
+        pageSizeParam: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE,
+        redisOptions: scala.collection.mutable.HashMap[String, Object] = scala.collection.mutable.HashMap("host" -> LeaderboardDefaults.DEFAULT_REDIS_HOST, "port" -> LeaderboardDefaults.DEFAULT_REDIS_PORT.asInstanceOf[AnyRef])) {
+    private var redisClient: RedisClient = _;
+    
+    if (redisOptions.get("redis_connection") != None) {
+        redisClient = redisOptions.get("redis_connection").get.asInstanceOf[RedisClient]
+    } else {
+        redisClient = new RedisClient(host, port)
+    }
     
     val leaderboardName: String = leaderboardNameParam
     var pageSize: Int = pageSizeParam
