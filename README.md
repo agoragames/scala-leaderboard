@@ -8,9 +8,23 @@ Builds off ideas proposed in http://blog.agoragames.com/2011/01/01/creating-high
 Installation
 ============
 
-	
 Make sure your redis server is running! Redis configuration is outside the scope of this README, but 
 check out the Redis documentation, http://redis.io/documentation.
+
+scala-leaderboard uses Scala Build Tool, https://github.com/harrah/xsbt/wiki, for building and testing. Clone the source from GitHub and build using:
+
+  dczarnecki-agora:scala-leaderboard dczarnecki$ sbt package
+  [info] Set current project to default (in build file:/Users/dczarnecki/projects/scala-leaderboard/)
+  [info] Packaging /Users/dczarnecki/projects/scala-leaderboard/target/scala-2.9.0.final/scala-leaderboard_2.9.0-2.0.0.jar ...
+  [info] Done packaging.
+  [success] Total time: 1 s, completed Aug 5, 2011 9:20:44 AM  
+
+Testing
+=======
+
+You can run the tests using:
+
+  sbt test
 
 Compatibility
 ============
