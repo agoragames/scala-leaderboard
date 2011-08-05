@@ -22,9 +22,10 @@ class Leaderboard(leaderboardNameParam: String,
         redisClient = new RedisClient(host, port)
     }
     
-    val leaderboardName: String = leaderboardNameParam
-    var pageSize: Int = pageSizeParam
     val version = LeaderboardDefaults.VERSION
+    val leaderboardName: String = leaderboardNameParam
+    
+    var pageSize: Int = pageSizeParam
     
     if (pageSize < 1) {
         pageSize = LeaderboardDefaults.DEFAULT_PAGE_SIZE
@@ -125,12 +126,20 @@ class Leaderboard(leaderboardNameParam: String,
     }
     
     def scoreAndRankForIn(leaderboardName: String, member: String, useZeroIndexForRank: Boolean = false): scala.collection.mutable.HashMap[String, Object] = {
-        val dataMap = scala.collection.mutable.HashMap.empty[String, Object]
-        
+        var dataMap = scala.collection.mutable.HashMap.empty[String, Object]
+        var responses: List[Any] = redisClient.pipeline { transaction =>
+            transaction.zscore(leaderboardName, member)
+            transaction.zrank(leaderboardName, member, true)
+        }.get
+                
         dataMap += ("member" -> member)
-        dataMap += ("score" -> this.scoreForIn(leaderboardName, member))
-        dataMap += ("rank" -> this.rankForIn(leaderboardName, member, useZeroIndexForRank))
-        
+        dataMap += ("score" -> responses(0).asInstanceOf[Option[Double]])
+        if (!useZeroIndexForRank) {
+            dataMap += ("rank" -> Some(responses(1).asInstanceOf[Option[Int]].get + 1))
+        } else {
+            dataMap += ("rank" -> Some(responses(1).asInstanceOf[Option[Int]]))            
+        }     
+                
         dataMap
     }
 

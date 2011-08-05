@@ -230,7 +230,7 @@ class LeaderboardSpec extends Spec
             
             leaderboard.totalMembers.get should equal(25)
             
-            var leaders:java.util.List[(String, Double, Int)] = leaderboard.leaders(1)
+            var leaders: java.util.List[(String, Double, Int)] = leaderboard.leaders(1)
             
             leaders.size should equal(25)
             leaders.get(0)._1 should equal("member_25")
@@ -270,7 +270,7 @@ class LeaderboardSpec extends Spec
             
             leaderboard.totalMembers.get should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE * 3 + 1)
             
-            var leadersAroundMe:java.util.List[(String, Double, Int)] = leaderboard.aroundMe("member_30")
+            var leadersAroundMe: java.util.List[(String, Double, Int)] = leaderboard.aroundMe("member_30")
             (leadersAroundMe.size / 2) should equal(LeaderboardDefaults.DEFAULT_PAGE_SIZE / 2)
 
             leadersAroundMe = leaderboard.aroundMe("member_1")
@@ -291,7 +291,7 @@ class LeaderboardSpec extends Spec
             members(0) = "member_1"
             members(1) = "member_5"
             members(2) = "member_10"
-            var rankedMembers:java.util.List[(String, Double, Int)] = leaderboard.rankedInList(members)
+            var rankedMembers: java.util.List[(String, Double, Int)] = leaderboard.rankedInList(members)
             
             rankedMembers.size should equal(3)
             
