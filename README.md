@@ -34,6 +34,39 @@ The project has been developed using Scala version 2.9.0.1 and Scala Build Tool 
 Usage
 ============
 
+Create a new leaderboard or attach to an existing leaderboard named 'highscores':
+
+    scala> var highscore_lb = new Leaderboard("highscores", "localhost", 6379, 25)
+    leaderboard: com.agoragames.leaderboard.Leaderboard = com.agoragames.leaderboard.Leaderboard@2f8d604f
+    
+Add members to your leaderboard using rankMember:
+
+    scala> for (i <- 1 to 10) {
+         | highscore_lb.rankMember("member_" + i, i)
+         | }
+    
+You can call rankMember with the same member and the leaderboard will be updated automatically.
+
+Get some information about your leaderboard:
+
+    scala> highscore_lb.totalMembers
+    res4: Option[Int] = Some(10)
+    
+    scala> highscore_lb.totalPages
+    res5: Int = 1
+    
+Get some information about a specific member(s) in the leaderboard:
+
+    scala> highscore_lb.scoreFor("member_4")
+    res6: Option[Double] = Some(4.0)
+
+    scala> highscore_lb.rankFor("member_4")
+    res7: Option[Int] = Some(7)
+
+    scala> highscore_lb.rankFor("member_10")
+    res8: Option[Int] = Some(1)
+    
+
 Future Ideas
 ============
   
