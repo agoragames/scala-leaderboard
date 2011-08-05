@@ -173,16 +173,27 @@ class Leaderboard(leaderboardNameParam: String,
         }
         var endingOffset: Int = (startingOffset + pageSize) - 1
                 
-        var rawLeaderData = redisClient.zrangeWithScore(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
-
-        var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]        
-        if (rawLeaderData != None) {
+        var rawLeaderData = redisClient.zrange(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
+        var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]
+        
+        var responses = redisClient.pipeline { transaction =>
             for (leader <- rawLeaderData.get) {
-                massagedLeaderData.add((leader._1, leader._2, rankForIn(leaderboardName, leader._1, useZeroIndexForRank).get))
+                transaction.zscore(leaderboardName, leader)
+                transaction.zrank(leaderboardName, leader, true)
             }
+        }.get
+        
+        for (leaderIndex <- rawLeaderData.get.indices) {
+            var rank = responses(leaderIndex * 2 + 1).asInstanceOf[Some[Int]].get
+            
+            if (!useZeroIndexForRank) {
+                rank += 1
+            }
+            
+            massagedLeaderData.add((rawLeaderData.get(leaderIndex), responses(leaderIndex * 2).asInstanceOf[Some[Double]].get, rank))
         }
         
-        massagedLeaderData
+        massagedLeaderData        
     }
     
     def aroundMe(member: String, withScores: Boolean = true, withRank: Boolean = true, useZeroIndexForRank: Boolean = false, pageSize: Int = LeaderboardDefaults.DEFAULT_PAGE_SIZE): java.util.List[(String, Double, Int)] = {
