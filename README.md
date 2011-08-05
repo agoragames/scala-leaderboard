@@ -28,7 +28,9 @@ You can run the tests using:
 
 Compatibility
 ============
-	
+
+The project has been developed using Scala version 2.9.0.1 and Scala Build Tool version 0.10
+
 Usage
 ============
 
