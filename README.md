@@ -102,7 +102,38 @@ Other useful methods:
     checkMember(member): Check to see whether member is in the leaderboard
     scoreAndRankFor(member): Retrieve the score and rank for a member in a single call
     removeMembersInScoreRange(minScore, maxScore): Remove members from the leaderboard within a score range
+
+Performance Metrics
+===================
+
+    scala> benchmark(1) {
+         | report("sequential insert") {
+         | for (i <- 1 to 10000000) {
+         | highscore_lb.rankMember("member_" + i, i)
+         | }
+         | } ::
+         | Nil
+         | }
     
+         Name Time(s)
+         ===============================
+         sequential insert    963.581000
+         res4: List[(String, Long)] = List((sequential insert,963581))
+    
+    scala> benchmark(50000) {
+         | report("leaderboard page requests") {
+         | highscore_lb.leaders(scala.util.Random.nextInt(highscore_lb.totalPages) + 1)
+         | } ::
+         | Nil
+         | }
+    Name Time(s)
+    ===============================
+    leaderboard page requests 241.492000
+    res19: List[(String, Long)] = List((leaderboard page requests,241492))
+
+    scala> println(241.492000 / 50000)
+    0.00482984
+        
 Future Ideas
 ============
   
