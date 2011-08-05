@@ -106,6 +106,8 @@ Other useful methods:
 Performance Metrics
 ===================
 
+10 million sequential scores insert:
+
     scala> benchmark(1) {
          | report("sequential insert") {
          | for (i <- 1 to 10000000) {
@@ -119,6 +121,8 @@ Performance Metrics
          ===============================
          sequential insert    963.581000
          res4: List[(String, Long)] = List((sequential insert,963581))
+
+Average time to request an arbitrary page from the leaderboard:
     
     scala> benchmark(50000) {
          | report("leaderboard page requests") {
