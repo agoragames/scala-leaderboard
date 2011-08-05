@@ -66,7 +66,43 @@ Get some information about a specific member(s) in the leaderboard:
     scala> highscore_lb.rankFor("member_10")
     res8: Option[Int] = Some(1)
     
+Get page 1 in the leaderboard:
 
+    scala> highscore_lb.leaders(1)
+    res9: java.util.List[(String, Double, Int)] = [(member_10,10.0,1), (member_9,9.0,2), (member_8,8.0,3), (member_7,7.0,4), (member_6,6.0,5), (member_5,5.0,6), (member_4,4.0,7), (member_3,3.0,8), (member_2,2.0,9), (member_1,1.0,10)]
+    
+Add more members to your leaderboard:
+
+    scala> for (i <- 50 to 95) {
+         | highscore_lb.rankMember("member_" + i, i)
+         | }
+
+    scala> highscore_lb.totalPages
+    res11: Int = 3
+    
+Get an "Around Me" leaderboard for a member:
+
+    scala> highscore_lb.aroundMe("member_53")
+    res13: java.util.List[(String, Double, Int)] = [(member_65,65.0,31), (member_64,64.0,32), (member_63,63.0,33), (member_62,62.0,34), (member_61,61.0,35), (member_60,60.0,36), (member_59,59.0,37), (member_58,58.0,38), (member_57,57.0,39), (member_56,56.0,40), (member_55,55.0,41), (member_54,54.0,42), (member_53,53.0,43), (member_52,52.0,44), (member_51,51.0,45), (member_50,50.0,46), (member_10,10.0,47), (member_9,9.0,48), (member_8,8.0,49), (member_7,7.0,50), (member_6,6.0,51), (member_5,5.0,52), (member_4,4.0,53), (member_3,3.0,54), (member_2,2.0,55)]
+    
+Get rank and score for an arbitrary list of members (e.g. friends):
+
+    scala> highscore_lb.rankedInList(Array("member_1", "member_62", "member_67"))
+    res19: java.util.List[(String, Double, Int)] = [(member_1,1.0,56), (member_62,62.0,34), (member_67,67.0,29)]
+    
+Other useful methods:
+
+    deleteLeaderboard: Delete the current leaderboard  
+    removeMember(member): Remove a member from the leaderboard
+    totalMembers: Total # of members in the leaderboard
+    totalPages: Total # of pages in the leaderboard given the leaderboard's page_size	
+    changeScoreFor(member, score): Change the score for a member by some amount delta (delta could be positive or negative)
+    rankFor(member): Retrieve the rank for a given member in the leaderboard
+    scoreFor(member): Retrieve the score for a given member in the leaderboard
+    checkMember(member): Check to see whether member is in the leaderboard
+    scoreAndRankFor(member): Retrieve the score and rank for a member in a single call
+    removeMembersInScoreRange(minScore, maxScore): Remove members from the leaderboard within a score range
+    
 Future Ideas
 ============
   
