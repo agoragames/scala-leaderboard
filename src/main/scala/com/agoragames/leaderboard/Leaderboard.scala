@@ -176,21 +176,23 @@ class Leaderboard(leaderboardNameParam: String,
         var rawLeaderData = redisClient.zrange(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
         var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]
         
-        var responses = redisClient.pipeline { transaction =>
-            for (leader <- rawLeaderData.get) {
-                transaction.zscore(leaderboardName, leader)
-                transaction.zrank(leaderboardName, leader, true)
-            }
-        }.get
+        if (rawLeaderData != None) {
+            var responses = redisClient.pipeline { transaction =>
+                for (leader <- rawLeaderData.get) {
+                    transaction.zscore(leaderboardName, leader)
+                    transaction.zrank(leaderboardName, leader, true)
+                }
+            }.get
         
-        for (leaderIndex <- rawLeaderData.get.indices) {
-            var rank = responses(leaderIndex * 2 + 1).asInstanceOf[Some[Int]].get
+            for (leaderIndex <- rawLeaderData.get.indices) {
+                var rank = responses(leaderIndex * 2 + 1).asInstanceOf[Some[Int]].get
             
-            if (!useZeroIndexForRank) {
-                rank += 1
+                if (!useZeroIndexForRank) {
+                    rank += 1
+                }
+            
+                massagedLeaderData.add((rawLeaderData.get(leaderIndex), responses(leaderIndex * 2).asInstanceOf[Some[Double]].get, rank))
             }
-            
-            massagedLeaderData.add((rawLeaderData.get(leaderIndex), responses(leaderIndex * 2).asInstanceOf[Some[Double]].get, rank))
         }
         
         massagedLeaderData        
@@ -209,12 +211,26 @@ class Leaderboard(leaderboardNameParam: String,
         }
         var endingOffset = (startingOffset + pageSize) - 1
 
-        var rawLeaderData = redisClient.zrangeWithScore(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
+        var rawLeaderData = redisClient.zrange(leaderboardName, startingOffset, endingOffset, RedisClient.DESC)
         var massagedLeaderData: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]        
+
         if (rawLeaderData != None) {
-          for (leader <- rawLeaderData.get) {
-              massagedLeaderData.add((leader._1, leader._2, rankForIn(leaderboardName, leader._1, useZeroIndexForRank).get))
-          }
+            var responses = redisClient.pipeline { transaction =>
+                for (leader <- rawLeaderData.get) {
+                    transaction.zscore(leaderboardName, leader)
+                    transaction.zrank(leaderboardName, leader, true)
+                }
+            }.get
+        
+            for (leaderIndex <- rawLeaderData.get.indices) {
+                var rank = responses(leaderIndex * 2 + 1).asInstanceOf[Some[Int]].get
+            
+                if (!useZeroIndexForRank) {
+                    rank += 1
+                }
+            
+                massagedLeaderData.add((rawLeaderData.get(leaderIndex), responses(leaderIndex * 2).asInstanceOf[Some[Double]].get, rank))
+            }
         }
 
         massagedLeaderData
@@ -227,10 +243,23 @@ class Leaderboard(leaderboardNameParam: String,
     def rankedInListIn(leaderboardName: String, members: Array[String], withScores: Boolean = true, useZeroIndexForRank: Boolean = false): java.util.List[(String, Double, Int)] = {
         var ranksForMembers: java.util.List[(String, Double, Int)] = new java.util.ArrayList[(String, Double, Int)]
         
-        for (member <- members) {
-            var memberData: (String, Double, Int) = (member, scoreForIn(leaderboardName, member).get, rankForIn(leaderboardName, member, useZeroIndexForRank).get)
-            ranksForMembers.add(memberData)
+        var responses = redisClient.pipeline { transaction =>
+            for (member <- members) {
+                transaction.zscore(leaderboardName, member)
+                transaction.zrank(leaderboardName, member, true)
+            }
+        }.get
+    
+        for (memberIndex <- members.indices) {
+            var rank = responses(memberIndex * 2 + 1).asInstanceOf[Some[Int]].get
+        
+            if (!useZeroIndexForRank) {
+                rank += 1
+            }
+        
+            ranksForMembers.add((members(memberIndex), responses(memberIndex * 2).asInstanceOf[Some[Double]].get, rank))
         }
+        
         
         ranksForMembers
     }
