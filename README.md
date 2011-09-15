@@ -140,6 +140,16 @@ Average time to request an arbitrary page from the leaderboard:
         
 Future Ideas
 ============
+
+Ports
+=====
+The following ports have been made of the leaderboard gem.
+
+* Java: https://github.com/agoragames/java-leaderboard
+* NodeJS: https://github.com/omork/node-leaderboard
+* PHP: https://github.com/agoragames/php-leaderboard
+* Python: https://github.com/agoragames/python-leaderboard
+* Ruby: https://github.com/agoragames/leaderboard
   
 Contributing to scala-leaderboard
 =================================
